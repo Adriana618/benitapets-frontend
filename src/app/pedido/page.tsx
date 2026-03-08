@@ -106,7 +106,7 @@ export default function PedidoPage() {
         const msg = encodeURIComponent(
           `Hola Benita Pets! Quiero pedir:\n${cart.map((i) => `- ${i.quantity}x ${i.name} (S/${i.price})`).join("\n")}\n\nTotal: S/${total.toFixed(2)}\nNombre: ${name}\nTel: ${phone}\nDireccion: ${address}, ${district}\nPago: ${paymentMethod === "mercadopago" ? "Mercado Pago" : "Yape"}`
         );
-        window.open(`https://wa.me/51999999999?text=${msg}`, "_blank");
+        window.open(`https://wa.me/51950326992?text=${msg}`, "_blank");
         setLoading(false);
         return;
       }
@@ -133,13 +133,13 @@ export default function PedidoPage() {
       const msg = encodeURIComponent(
         `Hola! Pedido #${order.order_id}\nTotal: S/${total.toFixed(2)}\nPago: ${paymentMethod === "yape" ? "Yape" : "Mercado Pago"}`
       );
-      window.open(`https://wa.me/51999999999?text=${msg}`, "_blank");
+      window.open(`https://wa.me/51950326992?text=${msg}`, "_blank");
     } catch {
       // API down: fallback to WhatsApp
       const msg = encodeURIComponent(
         `Hola Benita Pets! Quiero pedir:\n${cart.map((i) => `- ${i.quantity}x ${i.name}`).join("\n")}\nTotal: S/${total.toFixed(2)}\nNombre: ${name}\nDireccion: ${address}, ${district}`
       );
-      window.open(`https://wa.me/51999999999?text=${msg}`, "_blank");
+      window.open(`https://wa.me/51950326992?text=${msg}`, "_blank");
     }
 
     setLoading(false);

@@ -1,7 +1,7 @@
 import Image from "next/image";
 
 const WHATSAPP_URL =
-  "https://wa.me/51999999999?text=Hola%20Benita%20Pets!%20Quiero%20hacer%20un%20pedido";
+  "https://wa.me/51950326992?text=Hola%20Benita%20Pets!%20Quiero%20hacer%20un%20pedido";
 
 const PRODUCTS = [
   {
