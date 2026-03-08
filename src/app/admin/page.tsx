@@ -440,7 +440,16 @@ export default function AdminPage() {
                       const margin = p.cost ? ((p.price - p.cost) / p.price * 100).toFixed(1) : "-";
                       return (
                         <tr key={p.id} className="border-t hover:bg-gray-50">
-                          <td className="px-4 py-3 font-medium">{p.brand}</td>
+                          <td className="px-4 py-3 font-medium">
+                            <div className="flex items-center gap-2">
+                              {p.image_url ? (
+                                <img src={p.image_url} alt="" className="w-8 h-8 object-contain rounded" />
+                              ) : (
+                                <div className="w-8 h-8 bg-gray-100 rounded flex items-center justify-center text-gray-300 text-xs">—</div>
+                              )}
+                              {p.brand}
+                            </div>
+                          </td>
                           <td className="px-4 py-3">{p.name}</td>
                           <td className="px-4 py-3">{p.weight_kg || "-"}</td>
                           <td className="px-4 py-3 text-xs">{p.flavor || "-"}</td>
@@ -601,13 +610,38 @@ export default function AdminPage() {
                   className="w-full border rounded-lg px-3 py-2 text-sm mt-1"
                 />
               </div>
-              <div>
-                <label className="text-xs text-gray-500 font-medium">URL imagen</label>
+              <div className="col-span-2">
+                <label className="text-xs text-gray-500 font-medium">Imagen del producto</label>
+                <div className="flex items-center gap-3 mt-1">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      const fd = new FormData();
+                      fd.append("file", file);
+                      const res = await authFetch(`${API}/api/admin/upload-image`, {
+                        method: "POST",
+                        body: fd,
+                      });
+                      if (res) {
+                        const data = await res.json();
+                        setForm({ ...form, image_url: `${API}${data.url}` });
+                        flash("Imagen subida");
+                      }
+                    }}
+                    className="text-sm file:mr-3 file:py-1.5 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-medium file:bg-benita-blue file:text-white hover:file:bg-blue-600 file:cursor-pointer"
+                  />
+                  {form.image_url && (
+                    <img src={form.image_url} alt="Preview" className="w-12 h-12 object-contain rounded border" />
+                  )}
+                </div>
                 <input
                   value={form.image_url}
                   onChange={(e) => setForm({ ...form, image_url: e.target.value })}
-                  className="w-full border rounded-lg px-3 py-2 text-sm mt-1"
-                  placeholder="https://..."
+                  className="w-full border rounded-lg px-3 py-2 text-sm mt-2"
+                  placeholder="o pega una URL directamente..."
                 />
               </div>
               <div className="flex items-center gap-2 col-span-2">
