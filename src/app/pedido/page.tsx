@@ -132,7 +132,7 @@ function PedidoContent() {
   }, []);
 
   const getProductImage = (p: CatalogProduct) => {
-    if (p.image_url) return p.image_url;
+    if (p.image_url) return `${API_URL}${p.image_url}`;
     return p.pet_type === "cat" ? "/images/product-ricocat.png" : "/images/product-dogchow.png";
   };
 

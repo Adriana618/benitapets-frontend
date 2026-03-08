@@ -443,7 +443,7 @@ export default function AdminPage() {
                           <td className="px-4 py-3 font-medium">
                             <div className="flex items-center gap-2">
                               {p.image_url ? (
-                                <img src={p.image_url} alt="" className="w-8 h-8 object-contain rounded" />
+                                <img src={p.image_url.startsWith("http") ? p.image_url : `${API}${p.image_url}`} alt="" className="w-8 h-8 object-contain rounded" />
                               ) : (
                                 <div className="w-8 h-8 bg-gray-100 rounded flex items-center justify-center text-gray-300 text-xs">—</div>
                               )}

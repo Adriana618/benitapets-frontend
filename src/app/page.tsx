@@ -129,7 +129,7 @@ function ProductCard({
 }) {
   const weight = product.weight_kg ? `${product.weight_kg}kg` : "";
   const placeholder = product.pet_type === "cat" ? "/images/product-ricocat.png" : "/images/product-dogchow.png";
-  const imageSrc = product.image_url || placeholder;
+  const imageSrc = product.image_url ? `${API}${product.image_url}` : placeholder;
 
   return (
     <div className="bg-white rounded-2xl border border-gray-100 p-4 hover:shadow-xl transition-shadow group">
