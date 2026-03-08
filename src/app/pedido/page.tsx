@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { Suspense, useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.benitapets.com";
@@ -23,7 +24,84 @@ interface CartItem {
   image: string;
 }
 
+function PaymentResult({ status, orderId }: { status: string; orderId: string | null }) {
+  const isSuccess = status === "success" || status === "approved";
+  const isPending = status === "pending" || status === "in_process";
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <header className="bg-white border-b">
+        <div className="max-w-4xl mx-auto px-4 py-4">
+          <a href="/" className="font-jonesy text-2xl text-benita-orange-dark">
+            benita pets
+          </a>
+        </div>
+      </header>
+      <main className="max-w-md mx-auto px-4 py-16 text-center">
+        <div className={`w-20 h-20 rounded-full mx-auto mb-6 flex items-center justify-center text-3xl ${
+          isSuccess ? "bg-green-100" : isPending ? "bg-yellow-100" : "bg-red-100"
+        }`}>
+          {isSuccess ? "✓" : isPending ? "⏳" : "✕"}
+        </div>
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">
+          {isSuccess
+            ? "¡Pago exitoso!"
+            : isPending
+            ? "Pago en proceso"
+            : "Pago no completado"}
+        </h1>
+        <p className="text-gray-500 mb-8">
+          {isSuccess
+            ? "Tu pedido fue confirmado. Te contactaremos por WhatsApp para coordinar la entrega."
+            : isPending
+            ? "Tu pago esta siendo procesado. Te notificaremos cuando se confirme."
+            : "El pago no se completo. Puedes intentar nuevamente o pedir por WhatsApp."}
+        </p>
+        {orderId && (
+          <p className="text-xs text-gray-400 mb-6">Pedido: {orderId.slice(0, 8)}...</p>
+        )}
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <a
+            href="/"
+            className="bg-benita-blue text-white px-6 py-3 rounded-full font-semibold text-sm"
+          >
+            Volver al inicio
+          </a>
+          {!isSuccess && (
+            <a
+              href="/pedido"
+              className="bg-benita-orange text-white px-6 py-3 rounded-full font-semibold text-sm"
+            >
+              Intentar de nuevo
+            </a>
+          )}
+          <a
+            href="https://wa.me/51950326992"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-green-500 text-white px-6 py-3 rounded-full font-semibold text-sm"
+          >
+            WhatsApp
+          </a>
+        </div>
+      </main>
+    </div>
+  );
+}
+
 export default function PedidoPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-50 flex items-center justify-center text-gray-400">Cargando...</div>}>
+      <PedidoContent />
+    </Suspense>
+  );
+}
+
+function PedidoContent() {
+  const searchParams = useSearchParams();
+  const paymentStatus = searchParams.get("status");
+  const orderId = searchParams.get("order_id") || searchParams.get("external_reference");
+
   const [catalog, setCatalog] = useState<CatalogProduct[]>([]);
   const [catalogLoading, setCatalogLoading] = useState(true);
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -36,6 +114,7 @@ export default function PedidoPage() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    if (paymentStatus) return; // skip fetch when showing payment result
     async function fetchCatalog() {
       try {
         const res = await fetch(`${API_URL}/api/products?limit=100`);
@@ -143,6 +222,11 @@ export default function PedidoPage() {
 
     setLoading(false);
   };
+
+  // If returning from Mercado Pago, show payment result
+  if (paymentStatus) {
+    return <PaymentResult status={paymentStatus} orderId={orderId} />;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
