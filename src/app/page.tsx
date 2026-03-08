@@ -369,40 +369,54 @@ function Footer() {
   return (
     <footer className="bg-gray-900 text-gray-400 py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+        <div className="flex flex-col md:flex-row justify-between items-start gap-8">
           <div>
             <span className="font-jonesy text-2xl text-benita-orange">
               benita pets
             </span>
             <p className="mt-2 text-sm">
-              Amor en cada huella. Arequipa, Peru.
+              Amor en cada huella. Arequipa, Perú.
             </p>
+            <p className="mt-1 text-xs text-gray-500">
+              Avelino Cáceres, Arequipa
+            </p>
+            <p className="text-xs text-gray-500">Tel: +51 950 326 992</p>
           </div>
-          <div className="flex gap-6 text-sm">
-            <a href="#productos" className="hover:text-white transition">
-              Productos
+          <div className="flex flex-col gap-2 text-sm">
+            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Navegación</span>
+            <a href="#productos" className="hover:text-white transition">Productos</a>
+            <a href="#precios" className="hover:text-white transition">Precios</a>
+            <a href="#delivery" className="hover:text-white transition">Delivery</a>
+            <a href="#nosotros" className="hover:text-white transition">Nosotros</a>
+          </div>
+          <div className="flex flex-col gap-2 text-sm">
+            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Legal</span>
+            <a href="/terminos" className="hover:text-white transition">Términos y Condiciones</a>
+            <a href="/privacidad" className="hover:text-white transition">Política de Privacidad</a>
+            <a href="/libro-reclamaciones" className="hover:text-white transition">Libro de Reclamaciones</a>
+          </div>
+          <div className="flex flex-col gap-3 items-center md:items-end">
+            <a
+              href={WHATSAPP_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-green-500 text-white px-6 py-3 rounded-full text-sm font-semibold hover:bg-green-600 transition"
+            >
+              WhatsApp
             </a>
-            <a href="#precios" className="hover:text-white transition">
-              Precios
-            </a>
-            <a href="#delivery" className="hover:text-white transition">
-              Delivery
-            </a>
-            <a href="#nosotros" className="hover:text-white transition">
-              Nosotros
+            <a
+              href="/libro-reclamaciones"
+              className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg text-xs font-medium hover:bg-red-700 transition"
+            >
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clipRule="evenodd" />
+              </svg>
+              Libro de Reclamaciones
             </a>
           </div>
-          <a
-            href={WHATSAPP_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="bg-green-500 text-white px-6 py-3 rounded-full text-sm font-semibold hover:bg-green-600 transition"
-          >
-            WhatsApp
-          </a>
         </div>
         <div className="mt-8 pt-8 border-t border-gray-800 text-center text-xs">
-          <p>&copy; 2025 Benita Pets. Todos los derechos reservados.</p>
+          <p>&copy; 2026 Benita Pets. Todos los derechos reservados.</p>
         </div>
       </div>
     </footer>
