@@ -1,40 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.benitapets.com";
 
-const CATALOG = [
-  {
-    id: "dog-chow-15",
-    name: "Dog Chow Carne y Pollo",
-    weight: "15kg",
-    price: 89.9,
-    image: "/images/product-dogchow.png",
-  },
-  {
-    id: "ricocat-sardina-9",
-    name: "Ricocat Sardina",
-    weight: "9kg",
-    price: 52.9,
-    image: "/images/product-ricocat.png",
-  },
-  {
-    id: "mimaskot-15",
-    name: "Mimaskot Carne y Pollo",
-    weight: "15kg",
-    price: 79.9,
-    image: "/images/product-mimaskot.png",
-  },
-  {
-    id: "bosko-plus-15",
-    name: "Bosko Plus",
-    weight: "15kg",
-    price: 64.9,
-    image: "/images/product-bosko.png",
-  },
-];
+interface CatalogProduct {
+  id: string;
+  name: string;
+  brand: string | null;
+  pet_type: string | null;
+  weight_kg: number | null;
+  price: number;
+  image_url: string | null;
+}
 
 interface CartItem {
   id: string;
@@ -45,6 +24,8 @@ interface CartItem {
 }
 
 export default function PedidoPage() {
+  const [catalog, setCatalog] = useState<CatalogProduct[]>([]);
+  const [catalogLoading, setCatalogLoading] = useState(true);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [step, setStep] = useState<"products" | "checkout" | "paying">("products");
   const [name, setName] = useState("");
@@ -54,7 +35,30 @@ export default function PedidoPage() {
   const [paymentMethod, setPaymentMethod] = useState<"mercadopago" | "yape">("mercadopago");
   const [loading, setLoading] = useState(false);
 
-  const addToCart = (product: (typeof CATALOG)[number]) => {
+  useEffect(() => {
+    async function fetchCatalog() {
+      try {
+        const res = await fetch(`${API_URL}/api/products?limit=100`);
+        if (res.ok) {
+          const data = await res.json();
+          setCatalog(data.products || []);
+        }
+      } catch {
+        // API unavailable
+      } finally {
+        setCatalogLoading(false);
+      }
+    }
+    fetchCatalog();
+  }, []);
+
+  const getProductImage = (p: CatalogProduct) => {
+    if (p.image_url) return p.image_url;
+    return p.pet_type === "cat" ? "/images/product-ricocat.png" : "/images/product-dogchow.png";
+  };
+
+  const addToCart = (product: CatalogProduct) => {
+    const image = getProductImage(product);
     setCart((prev) => {
       const existing = prev.find((i) => i.id === product.id);
       if (existing) {
@@ -64,7 +68,7 @@ export default function PedidoPage() {
       }
       return [
         ...prev,
-        { id: product.id, name: product.name, price: product.price, quantity: 1, image: product.image },
+        { id: product.id, name: product.name, price: Number(product.price), quantity: 1, image },
       ];
     });
   };
@@ -85,12 +89,12 @@ export default function PedidoPage() {
     setLoading(true);
 
     try {
-      // Create order
+      // Create order with real product UUIDs
       const orderRes = await fetch(`${API_URL}/api/orders`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          customer_id: "00000000-0000-0000-0000-000000000000", // guest
+          customer_id: "00000000-0000-0000-0000-000000000000",
           items: cart.map((i) => ({
             product_id: i.id,
             quantity: i.quantity,
@@ -102,7 +106,6 @@ export default function PedidoPage() {
       });
 
       if (!orderRes.ok) {
-        // If API is not ready yet, redirect to WhatsApp
         const msg = encodeURIComponent(
           `Hola Benita Pets! Quiero pedir:\n${cart.map((i) => `- ${i.quantity}x ${i.name} (S/${i.price})`).join("\n")}\n\nTotal: S/${total.toFixed(2)}\nNombre: ${name}\nTel: ${phone}\nDireccion: ${address}, ${district}\nPago: ${paymentMethod === "mercadopago" ? "Mercado Pago" : "Yape"}`
         );
@@ -114,7 +117,6 @@ export default function PedidoPage() {
       const order = await orderRes.json();
 
       if (paymentMethod === "mercadopago") {
-        // Create Mercado Pago preference
         const mpRes = await fetch(`${API_URL}/api/payments/create-preference`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -123,7 +125,6 @@ export default function PedidoPage() {
 
         if (mpRes.ok) {
           const mp = await mpRes.json();
-          // Redirect to Mercado Pago checkout
           window.location.href = mp.init_point;
           return;
         }
@@ -135,7 +136,6 @@ export default function PedidoPage() {
       );
       window.open(`https://wa.me/51950326992?text=${msg}`, "_blank");
     } catch {
-      // API down: fallback to WhatsApp
       const msg = encodeURIComponent(
         `Hola Benita Pets! Quiero pedir:\n${cart.map((i) => `- ${i.quantity}x ${i.name}`).join("\n")}\nTotal: S/${total.toFixed(2)}\nNombre: ${name}\nDireccion: ${address}, ${district}`
       );
@@ -181,60 +181,80 @@ export default function PedidoPage() {
             <h1 className="text-2xl font-bold text-gray-900 mb-6">
               Elige tus productos
             </h1>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {CATALOG.map((product) => {
-                const inCart = cart.find((i) => i.id === product.id);
-                return (
-                  <div
-                    key={product.id}
-                    className="bg-white rounded-2xl border p-4 flex flex-col"
-                  >
-                    <div className="bg-gray-50 rounded-xl p-3 flex items-center justify-center h-36 mb-3">
-                      <Image
-                        src={product.image}
-                        alt={product.name}
-                        width={120}
-                        height={120}
-                        className="object-contain h-28 w-auto"
-                      />
-                    </div>
-                    <h3 className="font-semibold text-sm text-gray-900">
-                      {product.name}
-                    </h3>
-                    <p className="text-xs text-gray-400">{product.weight}</p>
-                    <p className="text-lg font-bold text-benita-orange-dark mt-1">
-                      S/{product.price.toFixed(2)}
-                    </p>
-                    <div className="mt-auto pt-3">
-                      {inCart ? (
-                        <div className="flex items-center justify-between bg-benita-cream rounded-full px-3 py-1.5">
-                          <button
-                            onClick={() => removeFromCart(product.id)}
-                            className="w-8 h-8 rounded-full bg-white text-benita-orange-dark font-bold shadow-sm"
-                          >
-                            -
-                          </button>
-                          <span className="font-bold">{inCart.quantity}</span>
+            {catalogLoading ? (
+              <div className="text-center py-12 text-gray-400">Cargando productos...</div>
+            ) : catalog.length === 0 ? (
+              <div className="text-center py-12">
+                <p className="text-gray-500 mb-4">No pudimos cargar los productos.</p>
+                <a
+                  href="https://wa.me/51950326992?text=Hola%20Benita%20Pets!%20Quiero%20hacer%20un%20pedido"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-green-500 text-white px-6 py-3 rounded-full font-semibold"
+                >
+                  Pedir por WhatsApp
+                </a>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {catalog.map((product) => {
+                  const inCart = cart.find((i) => i.id === product.id);
+                  const image = getProductImage(product);
+                  const weight = product.weight_kg ? `${product.weight_kg}kg` : "";
+                  return (
+                    <div
+                      key={product.id}
+                      className="bg-white rounded-2xl border p-4 flex flex-col"
+                    >
+                      <div className="bg-gray-50 rounded-xl p-3 flex items-center justify-center h-36 mb-3">
+                        <Image
+                          src={image}
+                          alt={product.name}
+                          width={120}
+                          height={120}
+                          className="object-contain h-28 w-auto"
+                        />
+                      </div>
+                      <h3 className="font-semibold text-sm text-gray-900">
+                        {product.name}
+                      </h3>
+                      <p className="text-xs text-gray-400">
+                        {product.brand}{weight ? ` — ${weight}` : ""}
+                      </p>
+                      <p className="text-lg font-bold text-benita-orange-dark mt-1">
+                        S/{Number(product.price).toFixed(2)}
+                      </p>
+                      <div className="mt-auto pt-3">
+                        {inCart ? (
+                          <div className="flex items-center justify-between bg-benita-cream rounded-full px-3 py-1.5">
+                            <button
+                              onClick={() => removeFromCart(product.id)}
+                              className="w-8 h-8 rounded-full bg-white text-benita-orange-dark font-bold shadow-sm"
+                            >
+                              -
+                            </button>
+                            <span className="font-bold">{inCart.quantity}</span>
+                            <button
+                              onClick={() => addToCart(product)}
+                              className="w-8 h-8 rounded-full bg-benita-orange text-white font-bold shadow-sm"
+                            >
+                              +
+                            </button>
+                          </div>
+                        ) : (
                           <button
                             onClick={() => addToCart(product)}
-                            className="w-8 h-8 rounded-full bg-benita-orange text-white font-bold shadow-sm"
+                            className="w-full bg-benita-blue text-white py-2 rounded-full text-sm font-semibold hover:bg-blue-600 transition"
                           >
-                            +
+                            Agregar
                           </button>
-                        </div>
-                      ) : (
-                        <button
-                          onClick={() => addToCart(product)}
-                          className="w-full bg-benita-blue text-white py-2 rounded-full text-sm font-semibold hover:bg-blue-600 transition"
-                        >
-                          Agregar
-                        </button>
-                      )}
+                        )}
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
+            )}
           </>
         )}
 

@@ -48,7 +48,86 @@ const EMPTY_PRODUCT = {
   is_active: true,
 };
 
+function LoginScreen({ onLogin }: { onLogin: (token: string) => void }) {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    try {
+      const res = await fetch(`${API}/api/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.detail || "Credenciales incorrectas");
+      }
+      const data = await res.json();
+      onLogin(data.access_token);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error de conexion");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl border shadow-sm p-8 max-w-sm w-full">
+        <div className="text-center mb-6">
+          <a href="/" className="font-jonesy text-2xl text-benita-orange-dark">
+            benita pets
+          </a>
+          <p className="text-sm text-gray-500 mt-1">Panel de administracion</p>
+        </div>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="text-xs text-gray-500 font-medium">Usuario</label>
+            <input
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="w-full border rounded-lg px-3 py-2 text-sm mt-1"
+              placeholder="admin"
+              autoFocus
+            />
+          </div>
+          <div>
+            <label className="text-xs text-gray-500 font-medium">Contrasena</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full border rounded-lg px-3 py-2 text-sm mt-1"
+              placeholder="••••••••"
+            />
+          </div>
+          {error && (
+            <div className="bg-red-50 text-red-600 text-sm px-3 py-2 rounded-lg border border-red-200">
+              {error}
+            </div>
+          )}
+          <button
+            type="submit"
+            disabled={loading || !username || !password}
+            className="w-full bg-benita-blue text-white py-2.5 rounded-full font-semibold text-sm disabled:opacity-50"
+          >
+            {loading ? "Ingresando..." : "Ingresar"}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}
+
 export default function AdminPage() {
+  const [token, setToken] = useState<string | null>(null);
+  const [authChecked, setAuthChecked] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
   const [competitors, setCompetitors] = useState<Competitor[]>([]);
   const [total, setTotal] = useState(0);
@@ -62,25 +141,62 @@ export default function AdminPage() {
   const [seedText, setSeedText] = useState("");
   const [msg, setMsg] = useState("");
 
+  useEffect(() => {
+    const saved = localStorage.getItem("admin_token");
+    if (saved) setToken(saved);
+    setAuthChecked(true);
+  }, []);
+
+  const handleLogin = (newToken: string) => {
+    setToken(newToken);
+    localStorage.setItem("admin_token", newToken);
+  };
+
+  const handleLogout = () => {
+    setToken(null);
+    localStorage.removeItem("admin_token");
+  };
+
+  const authFetch = useCallback(async (url: string, options?: RequestInit) => {
+    const res = await fetch(url, {
+      ...options,
+      headers: {
+        ...options?.headers,
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (res.status === 401 || res.status === 403) {
+      handleLogout();
+      return null;
+    }
+    return res;
+  }, [token]);
+
   const fetchProducts = useCallback(async () => {
+    if (!token) return;
     setLoading(true);
-    const res = await fetch(`${API}/api/admin/products?limit=500`);
+    const res = await authFetch(`${API}/api/admin/products?limit=500`);
+    if (!res) return;
     const data = await res.json();
     setProducts(data.products || []);
     setTotal(data.total || 0);
     setLoading(false);
-  }, []);
+  }, [token, authFetch]);
 
   const fetchCompetitors = useCallback(async () => {
-    const res = await fetch(`${API}/api/admin/competitors`);
+    if (!token) return;
+    const res = await authFetch(`${API}/api/admin/competitors`);
+    if (!res) return;
     const data = await res.json();
     setCompetitors(data.competitors || []);
-  }, []);
+  }, [token, authFetch]);
 
   useEffect(() => {
-    fetchProducts();
-    fetchCompetitors();
-  }, [fetchProducts, fetchCompetitors]);
+    if (token) {
+      fetchProducts();
+      fetchCompetitors();
+    }
+  }, [token, fetchProducts, fetchCompetitors]);
 
   const flash = (m: string) => {
     setMsg(m);
@@ -96,14 +212,14 @@ export default function AdminPage() {
     };
 
     if (editingId) {
-      await fetch(`${API}/api/admin/products/${editingId}`, {
+      await authFetch(`${API}/api/admin/products/${editingId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
       flash("Producto actualizado");
     } else {
-      await fetch(`${API}/api/admin/products`, {
+      await authFetch(`${API}/api/admin/products`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -118,7 +234,7 @@ export default function AdminPage() {
 
   const deleteProduct = async (id: string) => {
     if (!confirm("Eliminar este producto?")) return;
-    await fetch(`${API}/api/admin/products/${id}`, { method: "DELETE" });
+    await authFetch(`${API}/api/admin/products/${id}`, { method: "DELETE" });
     flash("Producto eliminado");
     fetchProducts();
   };
@@ -146,14 +262,15 @@ export default function AdminPage() {
   // --- Competitor Prices ---
   const openPriceEditor = async (productId: string) => {
     setPriceEditor(productId);
-    const res = await fetch(`${API}/api/admin/competitor-prices/${productId}`);
+    const res = await authFetch(`${API}/api/admin/competitor-prices/${productId}`);
+    if (!res) return;
     const data = await res.json();
     setCompPrices(data.prices || []);
   };
 
   const saveCompPrice = async (competitorId: string, price: number) => {
     if (!priceEditor || !price) return;
-    await fetch(`${API}/api/admin/competitor-prices`, {
+    await authFetch(`${API}/api/admin/competitor-prices`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -168,7 +285,7 @@ export default function AdminPage() {
 
   const addCompetitor = async () => {
     if (!newCompName.trim()) return;
-    await fetch(`${API}/api/admin/competitors`, {
+    await authFetch(`${API}/api/admin/competitors`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name: newCompName.trim(), base_url: "" }),
@@ -211,17 +328,21 @@ export default function AdminPage() {
       };
     });
 
-    const res = await fetch(`${API}/api/admin/products/bulk`, {
+    const res = await authFetch(`${API}/api/admin/products/bulk`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(products),
     });
+    if (!res) return;
     const data = await res.json();
     flash(`${data.created} productos creados`);
     setSeedText("");
     setTab("products");
     fetchProducts();
   };
+
+  if (!authChecked) return null;
+  if (!token) return <LoginScreen onLogin={handleLogin} />;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -236,7 +357,15 @@ export default function AdminPage() {
               Admin
             </span>
           </div>
-          <span className="text-sm text-gray-400">{total} productos</span>
+          <div className="flex items-center gap-4">
+            <span className="text-sm text-gray-400">{total} productos</span>
+            <button
+              onClick={handleLogout}
+              className="text-xs text-red-400 hover:text-red-600 font-medium"
+            >
+              Cerrar sesion
+            </button>
+          </div>
         </div>
       </header>
 
