@@ -1,0 +1,21 @@
+{
+  "name": "Benita Pets - Comida para mascotas en Arequipa",
+  "short_name": "Benita Pets",
+  "description": "Los mejores precios en comida para perros y gatos en Arequipa",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fff8f0",
+  "theme_color": "#f87004",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

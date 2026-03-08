@@ -15,21 +15,75 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "Benita Pets | Comida y productos para mascotas en Arequipa",
+  metadataBase: new URL("https://benitapets.com"),
+  title: {
+    default: "Benita Pets | Comida para mascotas al mejor precio en Arequipa",
+    template: "%s | Benita Pets",
+  },
   description:
-    "Los mejores precios en comida para perros y gatos en Arequipa. Compara precios y comprueba que somos más baratos. Delivery a toda la ciudad.",
+    "Comida para perros y gatos con los precios mas bajos de Arequipa. Mas de 40 años en Avelino Caceres. Compara precios, delivery a domicilio. Dog Chow, Ricocat, Mimaskot y mas.",
   keywords: [
     "pet shop arequipa",
     "comida para perros arequipa",
     "comida para gatos arequipa",
     "benita pets",
     "mascotas arequipa",
+    "tienda mascotas arequipa",
+    "dog chow arequipa",
+    "ricocat arequipa",
+    "mimaskot arequipa",
+    "delivery mascotas arequipa",
+    "comida mascotas barato",
+    "avelino caceres mascotas",
   ],
-  icons: {
-    icon: [
-      { url: "/favicon.svg", type: "image/svg+xml" },
+  authors: [{ name: "Benita Pets" }],
+  creator: "Benita Pets",
+  openGraph: {
+    type: "website",
+    locale: "es_PE",
+    url: "https://benitapets.com",
+    siteName: "Benita Pets",
+    title: "Benita Pets | Comida para mascotas al mejor precio en Arequipa",
+    description:
+      "Los precios mas bajos en comida para perros y gatos en Arequipa. Mas de 40 años de experiencia. Delivery a domicilio.",
+    images: [
+      {
+        url: "/images/hero-dog.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Benita Pets - Comida para mascotas en Arequipa",
+      },
     ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Benita Pets | Comida para mascotas al mejor precio en Arequipa",
+    description:
+      "Los precios mas bajos en comida para perros y gatos en Arequipa. Delivery a domicilio.",
+    images: ["/images/hero-dog.jpg"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  icons: {
+    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
     apple: "/apple-touch-icon.png",
+  },
+  manifest: "/manifest.json",
+  alternates: {
+    canonical: "https://benitapets.com",
+  },
+  verification: {
+    // Add your Google Search Console verification code here
+    // google: "your-verification-code",
   },
 };
 

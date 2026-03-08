@@ -409,11 +409,60 @@ function Footer() {
   );
 }
 
+function JsonLd() {
+  const localBusiness = {
+    "@context": "https://schema.org",
+    "@type": "PetStore",
+    name: "Benita Pets",
+    description:
+      "Tienda de comida y productos para mascotas con los mejores precios de Arequipa. Mas de 40 años de experiencia en Avelino Caceres.",
+    url: "https://benitapets.com",
+    logo: "https://benitapets.com/icon-512.png",
+    image: "https://benitapets.com/images/hero-dog.jpg",
+    telephone: "+51950326992",
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: "Arequipa",
+      addressRegion: "Arequipa",
+      addressCountry: "PE",
+    },
+    geo: {
+      "@type": "GeoCoordinates",
+      latitude: -16.3989,
+      longitude: -71.5350,
+    },
+    areaServed: {
+      "@type": "City",
+      name: "Arequipa",
+    },
+    priceRange: "$$",
+    openingHoursSpecification: {
+      "@type": "OpeningHoursSpecification",
+      dayOfWeek: [
+        "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday",
+      ],
+      opens: "08:00",
+      closes: "19:00",
+    },
+    sameAs: [
+      "https://wa.me/51950326992",
+    ],
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusiness) }}
+    />
+  );
+}
+
 export default async function Home() {
   const products = await getProducts();
 
   return (
     <>
+      <JsonLd />
       <Navbar />
       <Hero />
       <ProductsSection products={products} />
