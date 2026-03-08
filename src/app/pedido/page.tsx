@@ -94,7 +94,6 @@ export default function PedidoPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          customer_id: "00000000-0000-0000-0000-000000000000",
           items: cart.map((i) => ({
             product_id: i.id,
             quantity: i.quantity,
