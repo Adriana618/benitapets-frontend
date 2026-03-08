@@ -9,8 +9,17 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+        benita: {
+          blue: "#4f7fff",
+          orange: "#ffa41b",
+          "orange-dark": "#f87004",
+          pink: "#c99bc4",
+          cream: "#fff8f0",
+        },
+      },
+      fontFamily: {
+        jonesy: ["var(--font-jonesy)"],
+        poppins: ["var(--font-poppins)"],
       },
     },
   },
