@@ -84,9 +84,7 @@ function Hero() {
           </p>
           <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
             <a
-              href={WHATSAPP_URL}
-              target="_blank"
-              rel="noopener noreferrer"
+              href="/pedido"
               className="bg-benita-orange text-white font-semibold px-8 py-4 rounded-full text-lg hover:bg-benita-orange-dark transition shadow-lg shadow-orange-200"
             >
               Haz tu pedido

@@ -25,6 +25,12 @@ export const metadata: Metadata = {
     "benita pets",
     "mascotas arequipa",
   ],
+  icons: {
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+    ],
+    apple: "/apple-touch-icon.png",
+  },
 };
 
 export default function RootLayout({
