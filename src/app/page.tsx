@@ -429,27 +429,31 @@ function JsonLd() {
     "@type": "PetStore",
     name: "Benita Pets",
     description:
-      "Tienda de comida y productos para mascotas con los mejores precios de Arequipa. Mas de 40 años de experiencia en Avelino Caceres.",
+      "Tienda de comida y productos para mascotas con los mejores precios de Arequipa. Mas de 40 años de experiencia en Avelino Caceres. Delivery a domicilio.",
     url: "https://benitapets.com",
     logo: "https://benitapets.com/icon-512.png",
     image: "https://benitapets.com/images/hero-dog.jpg",
     telephone: "+51950326992",
     address: {
       "@type": "PostalAddress",
+      streetAddress: "Avelino Cáceres",
       addressLocality: "Arequipa",
       addressRegion: "Arequipa",
+      postalCode: "04001",
       addressCountry: "PE",
     },
     geo: {
       "@type": "GeoCoordinates",
       latitude: -16.3989,
-      longitude: -71.5350,
+      longitude: -71.535,
     },
     areaServed: {
       "@type": "City",
       name: "Arequipa",
     },
-    priceRange: "$$",
+    priceRange: "$",
+    currenciesAccepted: "PEN",
+    paymentAccepted: "Efectivo, Yape, Plin, Mercado Pago, Transferencia bancaria",
     openingHoursSpecification: {
       "@type": "OpeningHoursSpecification",
       dayOfWeek: [
@@ -458,16 +462,110 @@ function JsonLd() {
       opens: "08:00",
       closes: "19:00",
     },
+    hasOfferCatalog: {
+      "@type": "OfferCatalog",
+      name: "Productos para mascotas",
+      itemListElement: [
+        {
+          "@type": "OfferCatalog",
+          name: "Comida para perros",
+          itemListElement: [
+            { "@type": "Offer", itemOffered: { "@type": "Product", name: "Ricocan" } },
+            { "@type": "Offer", itemOffered: { "@type": "Product", name: "Dog Chow" } },
+            { "@type": "Offer", itemOffered: { "@type": "Product", name: "Thor" } },
+            { "@type": "Offer", itemOffered: { "@type": "Product", name: "Mimaskot" } },
+            { "@type": "Offer", itemOffered: { "@type": "Product", name: "Bosko" } },
+            { "@type": "Offer", itemOffered: { "@type": "Product", name: "Proplan" } },
+          ],
+        },
+        {
+          "@type": "OfferCatalog",
+          name: "Comida para gatos",
+          itemListElement: [
+            { "@type": "Offer", itemOffered: { "@type": "Product", name: "Ricocat" } },
+            { "@type": "Offer", itemOffered: { "@type": "Product", name: "Mimaskot Gatos" } },
+            { "@type": "Offer", itemOffered: { "@type": "Product", name: "Supercat" } },
+            { "@type": "Offer", itemOffered: { "@type": "Product", name: "Michicat" } },
+          ],
+        },
+      ],
+    },
     sameAs: [
       "https://wa.me/51950326992",
     ],
   };
 
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "¿Cuáles son los precios de comida para perros en Arequipa?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "En Benita Pets ofrecemos los precios más bajos de Arequipa en comida para perros. Por ejemplo: Ricocan 15kg desde S/99, Thor 25kg desde S/105, Dog Chow 21kg desde S/169. Ahorra hasta 20% comparado con otras tiendas.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "¿Hacen delivery de comida para mascotas en Arequipa?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Sí, hacemos delivery a toda la ciudad de Arequipa. Puedes pedir por WhatsApp al 950 326 992 o a través de nuestra web. Aceptamos Yape, Plin, Mercado Pago, transferencia y efectivo contra entrega.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "¿Dónde queda Benita Pets en Arequipa?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Estamos ubicados en Avelino Cáceres, Arequipa. Tenemos más de 40 años de experiencia vendiendo productos para mascotas. También puedes comprar online con delivery a domicilio.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "¿Qué marcas de comida para mascotas venden?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Vendemos las mejores marcas: Dog Chow, Ricocan, Ricocat, Thor, Mimaskot, Proplan, Bosko, Supercan, Supercat, Michicat, Maxicat y más. Todas al mejor precio de Arequipa.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "¿Cómo comparo precios de comida para mascotas?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "En nuestra web puedes comparar nuestros precios con tiendas como SuperPet, Fallabella, PlazaVea y Makro. Nuestros precios son consistentemente 10-20% más bajos que la competencia.",
+        },
+      },
+    ],
+  };
+
+  const websiteSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "Benita Pets",
+    url: "https://benitapets.com",
+    description: "Tienda online de comida para mascotas con los mejores precios de Arequipa",
+    inLanguage: "es",
+  };
+
   return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusiness) }}
-    />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusiness) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+      />
+    </>
   );
 }
 
