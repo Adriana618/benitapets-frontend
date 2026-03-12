@@ -462,34 +462,31 @@ function JsonLd() {
       opens: "08:00",
       closes: "19:00",
     },
-    hasOfferCatalog: {
-      "@type": "OfferCatalog",
-      name: "Productos para mascotas",
-      itemListElement: [
-        {
-          "@type": "OfferCatalog",
-          name: "Comida para perros",
-          itemListElement: [
-            { "@type": "Offer", itemOffered: { "@type": "Product", name: "Ricocan" } },
-            { "@type": "Offer", itemOffered: { "@type": "Product", name: "Dog Chow" } },
-            { "@type": "Offer", itemOffered: { "@type": "Product", name: "Thor" } },
-            { "@type": "Offer", itemOffered: { "@type": "Product", name: "Mimaskot" } },
-            { "@type": "Offer", itemOffered: { "@type": "Product", name: "Bosko" } },
-            { "@type": "Offer", itemOffered: { "@type": "Product", name: "Proplan" } },
-          ],
+    makesOffer: [
+      {
+        "@type": "Offer",
+        itemOffered: {
+          "@type": "Service",
+          name: "Venta de comida para perros",
+          description: "Ricocan, Dog Chow, Thor, Mimaskot, Bosko, Proplan, Supercan y más marcas",
         },
-        {
-          "@type": "OfferCatalog",
-          name: "Comida para gatos",
-          itemListElement: [
-            { "@type": "Offer", itemOffered: { "@type": "Product", name: "Ricocat" } },
-            { "@type": "Offer", itemOffered: { "@type": "Product", name: "Mimaskot Gatos" } },
-            { "@type": "Offer", itemOffered: { "@type": "Product", name: "Supercat" } },
-            { "@type": "Offer", itemOffered: { "@type": "Product", name: "Michicat" } },
-          ],
+      },
+      {
+        "@type": "Offer",
+        itemOffered: {
+          "@type": "Service",
+          name: "Venta de comida para gatos",
+          description: "Ricocat, Supercat, Michicat, Maxicat, Mimaskot y más marcas",
         },
-      ],
-    },
+      },
+      {
+        "@type": "Offer",
+        itemOffered: {
+          "@type": "Service",
+          name: "Delivery de productos para mascotas en Arequipa",
+        },
+      },
+    ],
     sameAs: [
       "https://wa.me/51950326992",
     ],
